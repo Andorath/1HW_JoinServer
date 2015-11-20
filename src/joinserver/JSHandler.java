@@ -33,8 +33,6 @@ class JSHandler implements Runnable
             this.networkMap = networkMap;
             out = new ObjectOutputStream(clientSocket.getOutputStream());
             in = new ObjectInputStream(clientSocket.getInputStream());
-            
-            
         }
         catch (IOException ex)
         {
@@ -133,7 +131,7 @@ class JSHandler implements Runnable
         {
             Logger.getLogger(JSHandler.class.getName()).log(Level.SEVERE, null, ex);
         }
-        finally
+        /*finally
         {
             if(!peerSocket.isClosed())
             {
@@ -146,7 +144,7 @@ class JSHandler implements Runnable
                     Logger.getLogger(JSHandler.class.getName()).log(Level.SEVERE, null, ex);
                 }
             }
-        }
+        }*/
         
     }
     
