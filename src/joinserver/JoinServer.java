@@ -41,6 +41,7 @@ public class JoinServer
             while(true)
             {
                 Socket clientSocket = server.accept();
+                System.out.println("Connesso a: " + clientSocket.getInetAddress());
                 JSHandler worker = new JSHandler(clientSocket, networkMap);
                 executor.execute(worker);
             }
