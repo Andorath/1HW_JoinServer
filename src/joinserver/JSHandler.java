@@ -55,7 +55,7 @@ class JSHandler implements Runnable
         {
             Logger.getLogger(JSHandler.class.getName()).log(Level.SEVERE, null, ex);
         }
-        finally
+        /*finally NULL POINTER
         {
             if(!clientSocket.isClosed())
             {
@@ -68,7 +68,7 @@ class JSHandler implements Runnable
                     Logger.getLogger(JSHandler.class.getName()).log(Level.SEVERE, null, ex);
                 }
             }
-        }
+        }*/
         
     }
     
@@ -114,14 +114,8 @@ class JSHandler implements Runnable
         try 
         {
             if(peerInetSocketAddress.equals(joiningPeerInetSocketAddress))
-            {
-                body = "Benvenuto!";
-                m = new JSMessage(sender, 
-                                joiningPeerInetSocketAddress, 
-                                body, 
-                                networkMap.get(joiningPeerInetSocketAddress));
-                
-                this.out.writeObject(m);
+            { 
+                this.out.writeObject(networkMap.get(joiningPeerInetSocketAddress));
             }
             else
             {
