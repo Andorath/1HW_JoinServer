@@ -3,7 +3,6 @@ package joinserver;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.util.HashSet;
@@ -19,6 +18,7 @@ import java.util.logging.Logger;
 class JSHandler implements Runnable
 {
     private volatile TreeMap<InetSocketAddress, HashSet<InetSocketAddress>> networkMap;
+    private InetSocketAddress joiningPeerInetSocketAddress;
     private ObjectOutputStream out;
     private ObjectInputStream in;
     private Socket clientSocket;
@@ -40,34 +40,53 @@ class JSHandler implements Runnable
     @Override
     public void run()
     {
-        int peerPort = clientSocket.getPort();
-        InetAddress peerInetAddress = clientSocket.getInetAddress();
-        InetSocketAddress peerInetSocketAddress = new InetSocketAddress(peerInetAddress, peerPort);
-        addPeer(peerInetSocketAddress);
+        try
+        {
+            joiningPeerInetSocketAddress = (InetSocketAddress) in.readObject();
+            
+            addPeer();
+        }
+        catch (IOException | ClassNotFoundException ex)
+        {
+            Logger.getLogger(JSHandler.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        finally
+        {
+            if(!clientSocket.isClosed())
+            {
+                try
+                {
+                    clientSocket.close();
+                }
+                catch (IOException ex)
+                {
+                    Logger.getLogger(JSHandler.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            }
+        }
         
     }
     
-    private synchronized void addPeer(InetSocketAddress peerSocketAddress)
+    private synchronized void addPeer()
     {         
-         if (!networkMap.containsKey(peerSocketAddress))
+         if (!networkMap.containsKey(joiningPeerInetSocketAddress))
          {
              HashSet<InetSocketAddress> neighbours = new HashSet<>();
              
              neighbours.addAll(networkMap.keySet());
-             updateOtherNeighboursWith(peerSocketAddress);
-             
-             networkMap.put(peerSocketAddress, neighbours);
+             updateOtherNeighboursWith();
+             networkMap.put(joiningPeerInetSocketAddress, neighbours);
              
              sendNetworkToAll();
          }
     }
 
-    private synchronized void updateOtherNeighboursWith(InetSocketAddress peerSocketAddress)
+    private synchronized void updateOtherNeighboursWith()
     {
         for (Map.Entry<InetSocketAddress, HashSet<InetSocketAddress>> entry : networkMap.entrySet())
         {
             HashSet<InetSocketAddress> entryNeighbours = entry.getValue();
-            entryNeighbours.add(peerSocketAddress);
+            entryNeighbours.add(joiningPeerInetSocketAddress);
             entry.setValue(entryNeighbours);
         }
     }
@@ -80,23 +99,44 @@ class JSHandler implements Runnable
         }
     }
 
-    private void sendNetworkToPeer(InetSocketAddress peerInetSocketAddress)
+    private synchronized void sendNetworkToPeer(InetSocketAddress peerInetSocketAddress)
     {
-        try
+        Socket peerSocket = null;
+        
+        try 
         {
-            Socket peerSocket = new Socket(peerInetSocketAddress.getAddress(), peerInetSocketAddress.getPort());
-            ObjectOutputStream out = new ObjectOutputStream(peerSocket.getOutputStream());
-            ObjectInputStream in = new ObjectInputStream(peerSocket.getInputStream());
-            
-            HashSet<InetSocketAddress> neighbours = networkMap.get(peerInetSocketAddress);
-            
-            out.writeObject(neighbours);
+            if(peerInetSocketAddress.equals(joiningPeerInetSocketAddress))
+            {
+                this.out.writeObject(networkMap.get(joiningPeerInetSocketAddress));
+            }
+            else
+            {
+                peerSocket = new Socket(peerInetSocketAddress.getAddress(), peerInetSocketAddress.getPort());
+                ObjectOutputStream out = new ObjectOutputStream(peerSocket.getOutputStream());
+                HashSet<InetSocketAddress> neighbours = networkMap.get(peerInetSocketAddress);
+                out.writeObject(neighbours);
+            }
             
         }
         catch (IOException ex)
         {
             Logger.getLogger(JSHandler.class.getName()).log(Level.SEVERE, null, ex);
         }
+        finally
+        {
+            if(!peerSocket.isClosed())
+            {
+                try
+                {
+                    peerSocket.close();
+                }
+                catch (IOException ex)
+                {
+                    Logger.getLogger(JSHandler.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            }
+        }
+        
     }
     
 }
