@@ -10,6 +10,9 @@ import java.util.Map;
 import java.util.TreeMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+ 
+import communication.*;
+
 
 /**
  *
@@ -30,6 +33,8 @@ class JSHandler implements Runnable
             this.networkMap = networkMap;
             out = new ObjectOutputStream(clientSocket.getOutputStream());
             in = new ObjectInputStream(clientSocket.getInputStream());
+            
+            
         }
         catch (IOException ex)
         {
@@ -102,19 +107,31 @@ class JSHandler implements Runnable
     private synchronized void sendNetworkToPeer(InetSocketAddress peerInetSocketAddress)
     {
         Socket peerSocket = null;
+        Message m = null;
+        String body;
+        InetSocketAddress sender = new InetSocketAddress(JoinServer.SERVER_PORT);
         
         try 
         {
             if(peerInetSocketAddress.equals(joiningPeerInetSocketAddress))
             {
-                this.out.writeObject(networkMap.get(joiningPeerInetSocketAddress));
+                body = "Benvenuto!";
+                m = new JSMessage(sender, 
+                                joiningPeerInetSocketAddress, 
+                                body, 
+                                networkMap.get(joiningPeerInetSocketAddress));
+                
+                this.out.writeObject(m);
             }
             else
             {
                 peerSocket = new Socket(peerInetSocketAddress.getAddress(), peerInetSocketAddress.getPort());
                 ObjectOutputStream out = new ObjectOutputStream(peerSocket.getOutputStream());
+                
                 HashSet<InetSocketAddress> neighbours = networkMap.get(peerInetSocketAddress);
-                out.writeObject(neighbours);
+                body = "Zito + Antonella = Amore <3";
+                m = new JSMessage(sender, peerInetSocketAddress, body, neighbours);
+                out.writeObject(m);
             }
             
         }

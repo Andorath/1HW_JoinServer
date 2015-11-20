@@ -18,7 +18,7 @@ import java.util.logging.Logger;
  */
 public class JoinServer
 {
-    public static final int serverPort = 9999;
+    public static final int SERVER_PORT = 9999;
     
     private static final int nThread = 100;
     
@@ -34,7 +34,7 @@ public class JoinServer
     {
         try
         {
-            server = new ServerSocket(serverPort);
+            server = new ServerSocket(SERVER_PORT);
             System.out.println("SERVER AVVIATO!");
             
             Executor executor = Executors.newFixedThreadPool(nThread);
