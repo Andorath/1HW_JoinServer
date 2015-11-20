@@ -19,7 +19,8 @@ import java.util.logging.Logger;
 public class JoinServer
 {
     public static final int serverPort = 9999;
-    public static final int nThread = 100;
+    
+    private static final int nThread = 100;
     
     private volatile TreeMap<InetSocketAddress, HashSet<InetSocketAddress>> networkMap;
     ServerSocket server;
