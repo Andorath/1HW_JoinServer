@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.Comparator;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.TreeMap;
@@ -27,7 +28,19 @@ public class JoinServer
 
     public JoinServer()
     {
-        this.networkMap = new TreeMap<>();
+        this.networkMap = new TreeMap<>(new Comparator<InetSocketAddress>()
+        {
+            @Override
+            public int compare(InetSocketAddress o1, InetSocketAddress o2)
+            {
+                if (o1.getAddress().equals(o2.getAddress()) && (o1.getPort() == o2.getPort()))
+                {
+                    return 0;
+                }
+                else
+                    return -1;
+            }
+        });
     }
     
     public void start()
