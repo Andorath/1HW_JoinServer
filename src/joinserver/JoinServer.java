@@ -33,12 +33,8 @@ public class JoinServer
             @Override
             public int compare(InetSocketAddress o1, InetSocketAddress o2)
             {
-                if (o1.getAddress().equals(o2.getAddress()) && (o1.getPort() == o2.getPort()))
-                {
-                    return 0;
-                }
-                else
-                    return -1;
+                return (o1.getAddress().equals(o2.getAddress()) 
+                        && (o1.getPort() == o2.getPort())) ? 0 : -1;
             }
         });
     }
