@@ -30,6 +30,7 @@ class JSHandler implements Runnable
     {
         try
         {
+            this.clientSocket = clientSocket;
             this.networkMap = networkMap;
             out = new ObjectOutputStream(clientSocket.getOutputStream());
             in = new ObjectInputStream(clientSocket.getInputStream());
