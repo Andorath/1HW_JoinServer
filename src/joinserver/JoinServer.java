@@ -32,9 +32,15 @@ public class JoinServer
         {
             @Override
             public int compare(InetSocketAddress o1, InetSocketAddress o2)
-            {
-                return (o1.getAddress().equals(o2.getAddress()) 
-                        && (o1.getPort() == o2.getPort())) ? 0 : -1;
+            {                
+                if(!o1.getHostString().equalsIgnoreCase(o2.getHostString()))
+                {
+                    return o1.getHostString().compareToIgnoreCase(o2.getHostString());
+                }
+                else
+                {
+                    return Integer.compare(o1.getPort(), o2.getPort());
+                }
             }
         });
     }
