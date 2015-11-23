@@ -53,7 +53,7 @@ class JSHandler implements Runnable
         {
             Logger.getLogger(JSHandler.class.getName()).log(Level.SEVERE, null, ex);
         }
-        /*finally NULL POINTER
+        finally
         {
             if(!clientSocket.isClosed())
             {
@@ -66,7 +66,7 @@ class JSHandler implements Runnable
                     Logger.getLogger(JSHandler.class.getName()).log(Level.SEVERE, null, ex);
                 }
             }
-        }*/
+        }
         
     }
     
@@ -77,14 +77,14 @@ class JSHandler implements Runnable
              HashSet<InetSocketAddress> neighbours = new HashSet<>();
              
              neighbours.addAll(networkMap.keySet());
-             updateOtherNeighboursWith();
+             updateOtherNeighbours();
              networkMap.put(joiningPeerInetSocketAddress, neighbours);
              
              sendNetworkToAll();
          }
     }
 
-    private synchronized void updateOtherNeighboursWith()
+    private synchronized void updateOtherNeighbours()
     {
         for (Map.Entry<InetSocketAddress, HashSet<InetSocketAddress>> entry : networkMap.entrySet())
         {
@@ -131,9 +131,9 @@ class JSHandler implements Runnable
         {
             Logger.getLogger(JSHandler.class.getName()).log(Level.SEVERE, null, ex);
         }
-        /*finally
+        finally
         {
-            if(!peerSocket.isClosed())
+            if((peerSocket != null) && !peerSocket.isClosed())
             {
                 try
                 {
@@ -144,7 +144,7 @@ class JSHandler implements Runnable
                     Logger.getLogger(JSHandler.class.getName()).log(Level.SEVERE, null, ex);
                 }
             }
-        }*/
+        }
         
     }
     
