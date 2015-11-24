@@ -122,7 +122,7 @@ class JSHandler implements Runnable
                 ObjectOutputStream out = new ObjectOutputStream(peerSocket.getOutputStream());
                 
                 HashSet<InetSocketAddress> neighbours = networkMap.get(peerInetSocketAddress);
-                body = "Zito + Antonella = Amore <3";
+                body = "Vicini aggiornati";
                 m = new JSMessage(sender, peerInetSocketAddress, body, neighbours);
                 out.writeObject(m);
             }
